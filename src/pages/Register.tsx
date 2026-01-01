@@ -249,11 +249,11 @@ export default function Register() {
                 className="mt-1 w-5 h-5 rounded border-[var(--color-border)] bg-[var(--color-bg-tertiary)] text-[var(--color-accent)] focus:ring-[var(--color-accent)] focus:ring-offset-0 cursor-pointer"
               />
               <span className="text-[var(--color-text-secondary)] text-sm flex-1">
-                <Link to="/terms-of-service" target="_blank" className="text-[var(--color-accent)] hover:underline">
+                <Link to="/terms-of-service" className="text-[var(--color-accent)] hover:underline">
                   Kullanım Şartları
                 </Link>
                 {' '}ve{' '}
-                <Link to="/privacy-policy" target="_blank" className="text-[var(--color-accent)] hover:underline">
+                <Link to="/privacy-policy" className="text-[var(--color-accent)] hover:underline">
                   Gizlilik Politikası
                 </Link>
                 'nı okudum ve kabul ediyorum.

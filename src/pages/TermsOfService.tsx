@@ -94,7 +94,7 @@ export default function TermsOfService() {
               <h2 className="text-2xl font-bold text-white mb-4">4. Veri İşleme ve Gizlilik</h2>
               <p className="text-[var(--color-text-secondary)] mb-4">
                 Kişisel verilerinizin işlenmesi hakkında detaylı bilgi için{' '}
-                <Link to="/privacy-policy" target="_blank" className="text-[var(--color-accent)] hover:underline">
+                <Link to="/privacy-policy" className="text-[var(--color-accent)] hover:underline">
                   Gizlilik Politikası
                 </Link>{' '}
                 belgesine bakınız.
