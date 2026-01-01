@@ -1,0 +1,63 @@
+# Dependencies
+node_modules
+
+# Build
+dist
+dist-ssr
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# TypeScript
+*.tsbuildinfo
+
+# GitHub Pages deployment
+.github/workflows/.env
+
+# Backup dosyaları (eğer varsa)
+*.backup
+*.bak
+*.sql.backup
+
+# Geçici dosyalar
+.tmp/
+tmp/
+
+# Tüm .md dosyaları (dokümantasyon)
+*.md
+
+# SADECE README.md'yi göster
+!README.md
+
+# SQL dosyaları (manuel script'ler)
+supabase/*.sql
+
+# SADECE schema.sql'i göster (DB kurmak için gerekli)
+!supabase/schema.sql
+
+# UYARI: scripts/seed-data.js ve update-final-scores.js dosyalarında
+# Service Role Key yerine placeholder kullanılıyor.
+# Bu dosyaları repository'de tutuyoruz ama sensitive key'ler yok.
+# ⚠️ Asla gerçek Service Role Key'i commit etmeyin!
