@@ -41,7 +41,7 @@ BEGIN
   END IF;
 
   -- 3. Mevcut tüm atamaları temizle
-  DELETE FROM assignments;
+  DELETE FROM assignments WHERE true;
 
   -- 4. Yeni atamaları ekle
   IF jsonb_array_length(assignments_data) > 0 THEN
