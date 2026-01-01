@@ -16,11 +16,11 @@ export default function DisclaimerBanner() {
           </p>
           <p className="text-amber-400/60 text-xs mt-2">
             Bu uygulamayı kullanarak{' '}
-            <Link to="/terms-of-service" target="_blank" className="underline hover:text-amber-300">
+            <Link to="/terms-of-service" className="underline hover:text-amber-300">
               Kullanım Şartları
             </Link>
             {' '}ve{' '}
-            <Link to="/privacy-policy" target="_blank" className="underline hover:text-amber-300">
+            <Link to="/privacy-policy" className="underline hover:text-amber-300">
               Gizlilik Politikası
             </Link>
             'nı kabul etmiş sayılırsınız.
