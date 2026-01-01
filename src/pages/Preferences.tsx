@@ -169,9 +169,8 @@ export default function Preferences() {
     setSaving(false)
   }
 
-  const availableCities = cities.filter(
-    city => !selectedPreferences.some(p => p.cityId === city.id)
-  )
+  // Tüm şehirler her kullanıcıda görünmeli
+  const availableCities = cities
 
   if (loading) {
     return (
@@ -223,20 +222,27 @@ export default function Preferences() {
               <p className="text-sm text-[var(--color-text-secondary)] mt-1">{availableCities.length} şehir mevcut</p>
             </div>
             <div className="p-6 grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[600px] overflow-y-auto">
-              {availableCities.map((city) => (
-                <button
-                  key={city.id}
-                  onClick={() => !periodClosed && addPreference(city)}
-                  disabled={periodClosed}
-                  className={`px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-                    periodClosed
-                      ? 'bg-[var(--color-bg-tertiary)] text-[var(--color-text-tertiary)] cursor-not-allowed'
-                      : 'bg-[var(--color-bg-tertiary)] text-white hover:bg-[var(--color-accent)] hover:scale-105 border border-transparent hover:border-[var(--color-accent)]'
-                  }`}
-                >
-                  {city.name}
-                </button>
-              ))}
+              {availableCities.map((city) => {
+                const isSelected = selectedPreferences.some(p => p.cityId === city.id)
+                const isDisabled = periodClosed || isSelected
+                
+                return (
+                  <button
+                    key={city.id}
+                    onClick={() => !isDisabled && addPreference(city)}
+                    disabled={isDisabled}
+                    className={`px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+                      isSelected
+                        ? 'bg-[var(--color-accent)]/20 text-[var(--color-accent)] cursor-not-allowed border border-[var(--color-accent)]/50'
+                        : periodClosed
+                        ? 'bg-[var(--color-bg-tertiary)] text-[var(--color-text-tertiary)] cursor-not-allowed'
+                        : 'bg-[var(--color-bg-tertiary)] text-white hover:bg-[var(--color-accent)] hover:scale-105 border border-transparent hover:border-[var(--color-accent)]'
+                    }`}
+                  >
+                    {isSelected && '✓ '}{city.name}
+                  </button>
+                )
+              })}
             </div>
           </div>
 
