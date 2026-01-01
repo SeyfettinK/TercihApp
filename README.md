@@ -23,7 +23,9 @@
 ### 1. Supabase Projesi Oluşturma
 
 1. [supabase.com](https://supabase.com) adresinde yeni bir proje oluşturun
-2. SQL Editor'a gidin ve `supabase/schema.sql` dosyasındaki SQL'i çalıştırın
+2. SQL Editor'a gidin ve sırasıyla aşağıdaki SQL dosyalarını çalıştırın:
+   - `supabase/schema.sql` - Ana veritabanı şeması
+   - `supabase/auto-simulation-fix.sql` - Otomatik simülasyon için RPC function
 3. Project Settings > API bölümünden URL ve anon key'i kopyalayın
 
 ### 2. Projeyi Klonlama

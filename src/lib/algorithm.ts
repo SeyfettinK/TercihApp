@@ -130,10 +130,7 @@ export async function runPlacementAlgorithmAsync(): Promise<SimulationResult> {
     // 2. Run the algorithm
     const results = runPlacementAlgorithm(profiles, cities, preferences)
 
-    // 3. Clear existing assignments
-    await supabase.from('assignments').delete().neq('id', '00000000-0000-0000-0000-000000000000')
-
-    // 4. Insert new assignments
+    // 3. Prepare assignments data
     const assignmentsToInsert = results
       .filter(r => r.cityId !== null)
       .map(r => ({
@@ -142,23 +139,22 @@ export async function runPlacementAlgorithmAsync(): Promise<SimulationResult> {
         assignment_type: r.type,
       }))
 
-    if (assignmentsToInsert.length > 0) {
-      const { error: insertError } = await supabase
-        .from('assignments')
-        .insert(assignmentsToInsert)
+    // 4. Save via RPC (SECURITY DEFINER ile admin yetkisiyle çalışır)
+    const { data: rpcResult, error: rpcError } = await supabase.rpc('save_simulation_results', {
+      assignments_data: assignmentsToInsert
+    })
 
-      if (insertError) throw new Error('Atamalar kaydedilemedi: ' + insertError.message)
+    if (rpcError) {
+      throw new Error('RPC hatası: ' + rpcError.message)
     }
 
-    // 5. Publish results
-    await supabase
-      .from('settings')
-      .update({ results_published: true })
-      .eq('id', 1)
+    if (!rpcResult || !rpcResult.success) {
+      throw new Error(rpcResult?.error || 'Simülasyon sonuçları kaydedilemedi')
+    }
 
     return {
       success: true,
-      assigned: assignmentsToInsert.length
+      assigned: rpcResult.assigned || assignmentsToInsert.length
     }
 
   } catch (error) {

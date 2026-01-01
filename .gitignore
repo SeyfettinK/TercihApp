@@ -54,8 +54,9 @@ tmp/
 # SQL dosyaları (manuel script'ler)
 supabase/*.sql
 
-# SADECE schema.sql'i göster (DB kurmak için gerekli)
+# Gerekli SQL dosyalarını göster
 !supabase/schema.sql
+!supabase/auto-simulation-fix.sql
 
 # UYARI: scripts/seed-data.js ve update-final-scores.js dosyalarında
 # Service Role Key yerine placeholder kullanılıyor.
