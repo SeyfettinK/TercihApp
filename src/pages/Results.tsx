@@ -111,7 +111,12 @@ export default function Results() {
               </div>
               <div className="flex-1">
                 <h2 className="text-xl font-bold text-white mb-1">{profile.full_name}</h2>
-                <p className="text-[var(--color-text-secondary)]">Sıralama: {getMyRank()} | Nihai Puan: {profile.final_score.toFixed(2)}</p>
+                <p className="text-[var(--color-text-secondary)]">
+                  Sıralama: {getMyRank()} | Nihai Puan: {profile.final_score.toFixed(2)}
+                  {profile.years_of_service !== null && profile.years_of_service !== undefined && (
+                    <> | Hizmet Yılı: {profile.years_of_service} yıl</>
+                  )}
+                </p>
                 {myAssignment ? (
                   <div className="mt-3">
                     <span className="text-[var(--color-text-secondary)]">Yerleştiğiniz İl: </span>
@@ -192,6 +197,7 @@ export default function Results() {
                   <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">Sıra</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">Ad Soyad</th>
                   <th className="px-4 py-3 text-right text-xs font-medium text-[var(--color-text-tertiary)] uppercase">Nihai Puan</th>
+                  <th className="px-4 py-3 text-center text-xs font-medium text-[var(--color-text-tertiary)] uppercase">Hizmet Yılı</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">Tercihleri</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">Yerleştiği İl</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">Tür</th>
@@ -234,6 +240,15 @@ export default function Results() {
                     </td>
                     <td className="px-4 py-3 text-right text-[var(--color-text-secondary)]">
                       {assignment.profile?.final_score.toFixed(2) || '-'}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      {assignment.profile?.years_of_service !== null && assignment.profile?.years_of_service !== undefined ? (
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium bg-blue-500/20 text-blue-400">
+                          📅 {assignment.profile.years_of_service} yıl
+                        </span>
+                      ) : (
+                        <span className="text-[var(--color-text-tertiary)] text-xs">—</span>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex flex-wrap gap-1">
