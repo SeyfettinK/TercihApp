@@ -568,7 +568,7 @@ export default function Admin() {
                   full_name: formData.get('full_name') as string,
                   written_score: parseFloat(formData.get('written_score') as string),
                   interview_score: parseFloat(formData.get('interview_score') as string),
-                  years_of_service: yearsValue ? parseInt(yearsValue) : null,
+                  years_of_service: yearsValue ? parseInt(yearsValue) : undefined,
                   is_admin: formData.get('is_admin') === 'on',
                 })
               }}
