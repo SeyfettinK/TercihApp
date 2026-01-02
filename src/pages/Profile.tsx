@@ -255,8 +255,8 @@ export default function Profile() {
                     <p className="text-white font-medium">Hizmet Süreniz</p>
                     <p className="text-sm text-[var(--color-text-secondary)]">
                       {yearsOfService !== null && yearsOfService !== undefined 
-                        ? `${yearsOfService} yıl (Aynı puandaki adaylara karşı avantajlısınız! 🎯)`
-                        : 'Henüz girilmedi (İsteğe bağlı)'}
+                        ? `${yearsOfService} yıl - Aynı puana sahip adaylar arasında hizmet yılı yüksek olan öncelikli yerleşir`
+                        : 'Henüz girilmedi - Aynı puanda olup hizmet yılı girmeyenler 0 yıl kabul edilir'}
                     </p>
                   </div>
                 </div>
