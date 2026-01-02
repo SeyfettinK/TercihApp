@@ -114,7 +114,7 @@ export default function Results() {
                 <p className="text-[var(--color-text-secondary)]">
                   Sıralama: {getMyRank()} | Nihai Puan: {profile.final_score.toFixed(2)}
                   {profile.years_of_service !== null && profile.years_of_service !== undefined && (
-                    <> | Hizmet Yılı: {profile.years_of_service} yıl</>
+                    <> | Hizmet Yılı: {profile.years_of_service}</>
                   )}
                 </p>
                 {myAssignment ? (
@@ -244,7 +244,7 @@ export default function Results() {
                     <td className="px-4 py-3 text-center">
                       {assignment.profile?.years_of_service !== null && assignment.profile?.years_of_service !== undefined ? (
                         <span className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium bg-blue-500/20 text-blue-400">
-                          📅 {assignment.profile.years_of_service} yıl
+                          📅 {assignment.profile.years_of_service}
                         </span>
                       ) : (
                         <span className="text-[var(--color-text-tertiary)] text-xs">—</span>
