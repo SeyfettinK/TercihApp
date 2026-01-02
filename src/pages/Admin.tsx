@@ -257,6 +257,7 @@ export default function Admin() {
                   <th className="px-4 py-3 text-right text-xs font-medium text-gray-400 uppercase">Yazılı</th>
                   <th className="px-4 py-3 text-right text-xs font-medium text-gray-400 uppercase">Mülakat</th>
                   <th className="px-4 py-3 text-right text-xs font-medium text-gray-400 uppercase">Nihai</th>
+                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-400 uppercase">Hizmet</th>
                   <th className="px-4 py-3 text-center text-xs font-medium text-gray-400 uppercase">Admin</th>
                   <th className="px-4 py-3 text-center text-xs font-medium text-gray-400 uppercase">İşlem</th>
                 </tr>
@@ -269,6 +270,15 @@ export default function Admin() {
                     <td className="px-4 py-3 text-right text-gray-300">{p.written_score.toFixed(2)}</td>
                     <td className="px-4 py-3 text-right text-gray-300">{p.interview_score.toFixed(2)}</td>
                     <td className="px-4 py-3 text-right font-bold text-teal-400">{p.final_score.toFixed(2)}</td>
+                    <td className="px-4 py-3 text-center">
+                      {p.years_of_service !== null && p.years_of_service !== undefined ? (
+                        <span className="px-2 py-1 rounded text-xs bg-blue-500/20 text-blue-400 font-medium">
+                          {p.years_of_service} yıl
+                        </span>
+                      ) : (
+                        <span className="text-gray-500 text-xs">—</span>
+                      )}
+                    </td>
                     <td className="px-4 py-3 text-center">
                       <span className={`px-2 py-1 rounded text-xs ${p.is_admin ? 'bg-purple-500/20 text-purple-400' : 'bg-gray-500/20 text-gray-400'}`}>
                         {p.is_admin ? 'Evet' : 'Hayır'}
@@ -553,10 +563,12 @@ export default function Admin() {
                 e.preventDefault()
                 const form = e.target as HTMLFormElement
                 const formData = new FormData(form)
+                const yearsValue = formData.get('years_of_service') as string
                 updateUser(editingUser.id, {
                   full_name: formData.get('full_name') as string,
                   written_score: parseFloat(formData.get('written_score') as string),
                   interview_score: parseFloat(formData.get('interview_score') as string),
+                  years_of_service: yearsValue ? parseInt(yearsValue) : null,
                   is_admin: formData.get('is_admin') === 'on',
                 })
               }}
@@ -598,6 +610,23 @@ export default function Admin() {
                     required
                   />
                 </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
+                  Hizmet Yılı <span className="text-xs text-[var(--color-text-tertiary)]">(İsteğe Bağlı)</span>
+                </label>
+                <input
+                  name="years_of_service"
+                  type="number"
+                  min="0"
+                  max="50"
+                  defaultValue={editingUser.years_of_service ?? ''}
+                  placeholder="Örn: 5 (boş bırakılabilir)"
+                  className="w-full px-4 py-3 bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] rounded-lg text-white placeholder-[var(--color-text-tertiary)] focus:outline-none focus:border-[var(--color-accent)] transition-all"
+                />
+                <p className="text-xs text-[var(--color-text-tertiary)] mt-2">
+                  💡 Aynı puana sahip kullanıcılar arasında tie-breaker olarak kullanılır
+                </p>
               </div>
               <div className="flex items-start gap-3 p-4 bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] rounded-lg">
                 <input

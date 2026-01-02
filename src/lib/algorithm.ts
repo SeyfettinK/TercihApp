@@ -23,8 +23,19 @@ export function runPlacementAlgorithm(
   const availableCities = new Set(cities.filter(c => c.is_available).map(c => c.id))
   const lotteryPool: Profile[] = []
   
-  // Sort profiles by final_score descending
-  const sortedProfiles = [...profiles].sort((a, b) => b.final_score - a.final_score)
+  // Sort profiles by final_score descending, then by years_of_service descending (tie-breaker)
+  const sortedProfiles = [...profiles].sort((a, b) => {
+    // Önce final_score'a göre sırala (büyükten küçüğe)
+    if (b.final_score !== a.final_score) {
+      return b.final_score - a.final_score
+    }
+    
+    // Eğer final_score aynıysa, years_of_service'e göre sırala (büyükten küçüğe)
+    // NULL veya undefined değerler 0 olarak kabul edilir (en düşük öncelik)
+    const aYears = a.years_of_service ?? 0
+    const bYears = b.years_of_service ?? 0
+    return bYears - aYears
+  })
   
   // Get preferences grouped by user
   const preferencesByUser = new Map<string, Preference[]>()

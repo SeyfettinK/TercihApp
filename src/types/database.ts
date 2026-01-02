@@ -8,6 +8,7 @@ export interface Profile {
   wants_lottery: boolean
   is_admin: boolean
   created_at: string
+  years_of_service?: number // İsteğe bağlı: Aynı puana sahip kullanıcılar için tie-breaker
 }
 
 export interface City {

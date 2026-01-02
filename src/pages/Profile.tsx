@@ -21,6 +21,11 @@ export default function Profile() {
   const [wantsLottery, setWantsLottery] = useState(profile?.wants_lottery || false)
   const [lotteryLoading, setLotteryLoading] = useState(false)
 
+  // Hizmet yılı
+  const [yearsOfService, setYearsOfService] = useState<number | null>(profile?.years_of_service ?? null)
+  const [editingYears, setEditingYears] = useState(false)
+  const [yearsLoading, setYearsLoading] = useState(false)
+
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -76,6 +81,28 @@ export default function Profile() {
     }
 
     setLotteryLoading(false)
+  }
+
+  const handleYearsUpdate = async () => {
+    setYearsLoading(true)
+    setMessage(null)
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ years_of_service: yearsOfService })
+        .eq('id', profile?.id)
+
+      if (error) throw error
+
+      setProfile({ ...profile!, years_of_service: yearsOfService ?? undefined })
+      setEditingYears(false)
+      setMessage({ type: 'success', text: '✅ Hizmet yılı bilginiz güncellendi!' })
+    } catch (error: any) {
+      setMessage({ type: 'error', text: `Güncelleme başarısız: ${error.message}` })
+    }
+
+    setYearsLoading(false)
   }
 
   const handleLogout = async () => {
@@ -144,6 +171,98 @@ export default function Profile() {
 
           {/* Sağ Kolon - Ayarlar */}
           <div className="lg:col-span-2 space-y-6">
+            {/* Hizmet Yılı */}
+            <div className="card overflow-hidden">
+              <div className="px-6 py-4 border-b border-[var(--color-border)] flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-white">Hizmet Yılı</h3>
+                {!editingYears && (
+                  <button
+                    onClick={() => setEditingYears(true)}
+                    className="px-4 py-2 bg-[var(--color-accent)]/20 text-[var(--color-accent)] rounded-lg hover:bg-[var(--color-accent)]/30 transition-all text-sm font-medium"
+                  >
+                    ✏️ Düzenle
+                  </button>
+                )}
+              </div>
+              
+              {editingYears ? (
+                <div className="p-6 space-y-4">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center text-2xl flex-shrink-0">
+                      📅
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-white font-medium mb-2">Hizmet Yılınızı Girin</p>
+                      <p className="text-sm text-[var(--color-text-secondary)] mb-4">
+                        Aynı puana sahip olduğunuz başka kullanıcılar varsa, hizmet yılı daha yüksek olan öncelikli olarak yerleştirilir.
+                        Bu alan <strong>isteğe bağlıdır</strong>, boş bırakabilirsiniz.
+                      </p>
+                      
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
+                          Hizmet Yılı (İsteğe Bağlı)
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="50"
+                          value={yearsOfService ?? ''}
+                          onChange={(e) => setYearsOfService(e.target.value ? parseInt(e.target.value) : null)}
+                          className="w-full px-4 py-3 bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] rounded-lg text-white placeholder-[var(--color-text-tertiary)] focus:border-[var(--color-accent)] transition-all"
+                          placeholder="Örn: 5 (boş bırakabilirsiniz)"
+                        />
+                        <p className="text-xs text-[var(--color-text-tertiary)] mt-2">
+                          💡 İpucu: Girmeseniz de olur. Ama girerseniz aynı puandaki diğer adaylara göre avantajlı olursunuz!
+                        </p>
+                      </div>
+
+                      <div className="flex gap-3">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingYears(false)
+                            setYearsOfService(profile?.years_of_service ?? null)
+                            setMessage(null)
+                          }}
+                          className="px-5 py-2.5 text-sm font-medium text-[var(--color-text-secondary)] hover:text-white hover:bg-[var(--color-bg-tertiary)] rounded-lg transition-all"
+                        >
+                          İptal
+                        </button>
+                        <button
+                          onClick={handleYearsUpdate}
+                          disabled={yearsLoading}
+                          className="btn-primary px-5 py-2.5"
+                        >
+                          {yearsLoading ? (
+                            <span className="flex items-center gap-2">
+                              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                              Kaydediliyor...
+                            </span>
+                          ) : (
+                            '✓ Kaydet'
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-6 flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center text-2xl">
+                    📅
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-white font-medium">Hizmet Süreniz</p>
+                    <p className="text-sm text-[var(--color-text-secondary)]">
+                      {yearsOfService !== null && yearsOfService !== undefined 
+                        ? `${yearsOfService} yıl (Aynı puandaki adaylara karşı avantajlısınız! 🎯)`
+                        : 'Henüz girilmedi (İsteğe bağlı)'}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Kura Tercihi */}
             <div className="card overflow-hidden">
               <div className="px-6 py-4 border-b border-[var(--color-border)]">

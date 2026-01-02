@@ -7,8 +7,10 @@
 - 📊 **Sıralama Tablosu**: Tüm adayların yazılı, mülakat ve nihai puanlarını görüntüleyin
 - 🎯 **Tercih Sistemi**: Drag & drop ile 10 şehir tercihi yapın
 - 🎲 **Genel Kura**: Tercihleriniz gelmezse kura ile yerleşme seçeneği
+- 📅 **Hizmet Yılı**: Aynı puana sahip kullanıcılar için tie-breaker sistemi
 - ⚙️ **Admin Paneli**: Kullanıcı yönetimi, şehir ekleme/silme, tercih dönemi kontrolü
 - 🏆 **Simülasyon**: Yerleştirme algoritmasını çalıştırın ve sonuçları yayınlayın
+- 🤖 **Otomatik Simülasyon**: Tercihler kaydedildiğinde otomatik yerleştirme
 
 ## Teknolojiler
 
@@ -26,6 +28,7 @@
 2. SQL Editor'a gidin ve sırasıyla aşağıdaki SQL dosyalarını çalıştırın:
    - `supabase/schema.sql` - Ana veritabanı şeması
    - `supabase/auto-simulation-fix.sql` - Otomatik simülasyon için RPC function
+   - `supabase/add-years-of-service.sql` - Hizmet yılı özelliği (yeni!)
 3. Project Settings > API bölümünden URL ve anon key'i kopyalayın
 
 ### 2. Projeyi Klonlama
