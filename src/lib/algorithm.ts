@@ -86,13 +86,13 @@ export function runPlacementAlgorithm(
     }
   }
   
-  // Shuffle lottery pool using Fisher-Yates
-  for (let i = lotteryPool.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[lotteryPool[i], lotteryPool[j]] = [lotteryPool[j], lotteryPool[i]]
-  }
+  // ⚠️ ÖNEMLI: Genel kura havuzunu karıştırmıyoruz!
+  // Kullanıcılar zaten puana göre sıralanmış ve havuza bu sırayla eklenmiş.
+  // Bu sıra korunmalı - yüksek puanlı kullanıcılar öncelikli.
+  // Örnek: 20. sıradaki kullanıcı tercihine yerleşemediyse,
+  // genel kuradan mutlaka yararlanabilmeli (çünkü 27 şehir var).
   
-  // Assign remaining cities to lottery pool
+  // Assign remaining cities to lottery pool (in order of final score)
   const remainingCities = Array.from(availableCities)
   for (let i = 0; i < lotteryPool.length && i < remainingCities.length; i++) {
     results.push({
