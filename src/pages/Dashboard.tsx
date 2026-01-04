@@ -16,10 +16,25 @@ export default function Dashboard() {
     const { data: profilesData } = await supabase
       .from('profiles')
       .select('*')
-      .order('final_score', { ascending: false })
 
     if (profilesData) {
-      setProfiles(profilesData as Profile[])
+      // Sıralama: Önce nihai puana göre (büyükten küçüğe)
+      // Aynı puandaysa hizmet yılına göre (büyükten küçüğe)
+      // Hizmet yılı yoksa 0 kabul edilir
+      const sortedProfiles = (profilesData as Profile[]).sort((a, b) => {
+        // Önce final_score'a göre sırala (büyükten küçüğe)
+        if (b.final_score !== a.final_score) {
+          return b.final_score - a.final_score
+        }
+        
+        // Eğer final_score aynıysa, years_of_service'e göre sırala (büyükten küçüğe)
+        // NULL veya undefined değerler 0 olarak kabul edilir
+        const aYears = a.years_of_service ?? 0
+        const bYears = b.years_of_service ?? 0
+        return bYears - aYears
+      })
+      
+      setProfiles(sortedProfiles)
     }
 
     const { data: settingsData } = await supabase

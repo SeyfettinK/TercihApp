@@ -24,14 +24,27 @@ export default function Results() {
   const fetchData = async () => {
     const [assignmentsRes, profilesRes, citiesRes, settingsRes, preferencesRes] = await Promise.all([
       supabase.from('assignments').select('*'),
-      supabase.from('profiles').select('*').order('final_score', { ascending: false }),
+      supabase.from('profiles').select('*'),
       supabase.from('cities').select('*').order('name'),
       supabase.from('settings').select('*').single(),
       supabase.from('preferences').select('*').order('priority'),
     ])
 
     if (settingsRes.data) setSettings(settingsRes.data as Settings)
-    if (profilesRes.data) setProfiles(profilesRes.data as Profile[])
+    
+    // Sort profiles with tie-breaker (years_of_service)
+    if (profilesRes.data) {
+      const sortedProfiles = (profilesRes.data as Profile[]).sort((a, b) => {
+        if (b.final_score !== a.final_score) {
+          return b.final_score - a.final_score
+        }
+        const aYears = a.years_of_service ?? 0
+        const bYears = b.years_of_service ?? 0
+        return bYears - aYears
+      })
+      setProfiles(sortedProfiles)
+    }
+    
     if (citiesRes.data) setCities(citiesRes.data as City[])
 
     if (assignmentsRes.data && profilesRes.data && citiesRes.data && preferencesRes.data) {
@@ -42,10 +55,19 @@ export default function Results() {
         preferences: preferencesRes.data.filter((pref: Preference) => pref.user_id === a.user_id),
       }))
 
-      // Sort by profile's final score
-      enrichedAssignments.sort((a, b) => 
-        (b.profile?.final_score || 0) - (a.profile?.final_score || 0)
-      )
+      // Sort by profile's final score and years_of_service (tie-breaker)
+      enrichedAssignments.sort((a, b) => {
+        const scoreA = a.profile?.final_score || 0
+        const scoreB = b.profile?.final_score || 0
+        
+        if (scoreB !== scoreA) {
+          return scoreB - scoreA
+        }
+        
+        const yearsA = a.profile?.years_of_service ?? 0
+        const yearsB = b.profile?.years_of_service ?? 0
+        return yearsB - yearsA
+      })
 
       setAssignments(enrichedAssignments)
 

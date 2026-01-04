@@ -23,12 +23,25 @@ export default function Admin() {
 
   const fetchData = async () => {
     const [profilesRes, citiesRes, settingsRes] = await Promise.all([
-      supabase.from('profiles').select('*').order('final_score', { ascending: false }),
+      supabase.from('profiles').select('*'),
       supabase.from('cities').select('*').order('name'),
       supabase.from('settings').select('*').single(),
     ])
 
-    if (profilesRes.data) setProfiles(profilesRes.data as Profile[])
+    if (profilesRes.data) {
+      // Sıralama: Önce nihai puana göre (büyükten küçüğe)
+      // Aynı puandaysa hizmet yılına göre (büyükten küçüğe)
+      const sortedProfiles = (profilesRes.data as Profile[]).sort((a, b) => {
+        if (b.final_score !== a.final_score) {
+          return b.final_score - a.final_score
+        }
+        const aYears = a.years_of_service ?? 0
+        const bYears = b.years_of_service ?? 0
+        return bYears - aYears
+      })
+      setProfiles(sortedProfiles)
+    }
+    
     if (citiesRes.data) setCities(citiesRes.data as City[])
     if (settingsRes.data) setSettings(settingsRes.data as Settings)
 
