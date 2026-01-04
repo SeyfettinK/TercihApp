@@ -21,7 +21,7 @@ export function runPlacementAlgorithm(
 ): AssignmentResult[] {
   const results: AssignmentResult[] = []
   const availableCities = new Set(cities.filter(c => c.is_available).map(c => c.id))
-  const lotteryPool: Profile[] = []
+  const totalCities = availableCities.size // Toplam müsait şehir sayısı (genellikle 27)
   
   // Sort profiles by final_score descending, then by years_of_service descending (tie-breaker)
   const sortedProfiles = [...profiles].sort((a, b) => {
@@ -52,8 +52,17 @@ export function runPlacementAlgorithm(
     preferencesByUser.set(userId, userPrefs)
   }
   
-  // Process each profile in order
-  for (const profile of sortedProfiles) {
+  // ⚠️ KRİTİK: İlk N kişi (N = şehir sayısı, genellikle 27) MUTLAKA yerleşmeli!
+  // Bu kişilere öncelik vermeliyiz.
+  
+  // PHASE 1: İlk N kişi için tercih bazlı yerleştirme
+  const topN = sortedProfiles.slice(0, totalCities) // İlk 27 kişi
+  const rest = sortedProfiles.slice(totalCities)     // 28+ kişiler
+  
+  const topNLotteryPool: Profile[] = []
+  
+  // İlk N kişi için tercih yerleştirmesi
+  for (const profile of topN) {
     const userPrefs = preferencesByUser.get(profile.id) || []
     let assigned = false
     
@@ -72,11 +81,13 @@ export function runPlacementAlgorithm(
       }
     }
     
-    // If not assigned and wants lottery, add to pool
+    // Eğer tercihine yerleşemediyse
     if (!assigned) {
       if (profile.wants_lottery) {
-        lotteryPool.push(profile)
+        // Genel kuraya katılmak istiyor → garanti yerleşecek (top N'de)
+        topNLotteryPool.push(profile)
       } else {
+        // Ne tercih ne de genel kura → yerleşemedi
         results.push({
           userId: profile.id,
           cityId: null,
@@ -86,29 +97,84 @@ export function runPlacementAlgorithm(
     }
   }
   
-  // ⚠️ ÖNEMLI: Genel kura havuzunu karıştırmıyoruz!
-  // Kullanıcılar zaten puana göre sıralanmış ve havuza bu sırayla eklenmiş.
-  // Bu sıra korunmalı - yüksek puanlı kullanıcılar öncelikli.
-  // Örnek: 20. sıradaki kullanıcı tercihine yerleşemediyse,
-  // genel kuradan mutlaka yararlanabilmeli (çünkü 27 şehir var).
+  // PHASE 2: 28+ kişiler için tercih bazlı yerleştirme (sadece kalan şehirlere)
+  const restLotteryPool: Profile[] = []
   
-  // Assign remaining cities to lottery pool (in order of final score)
-  const remainingCities = Array.from(availableCities)
-  for (let i = 0; i < lotteryPool.length && i < remainingCities.length; i++) {
-    results.push({
-      userId: lotteryPool[i].id,
-      cityId: remainingCities[i],
-      type: 'lottery'
-    })
+  for (const profile of rest) {
+    const userPrefs = preferencesByUser.get(profile.id) || []
+    let assigned = false
+    
+    // Try to assign based on preferences
+    for (const pref of userPrefs) {
+      if (availableCities.has(pref.city_id)) {
+        results.push({
+          userId: profile.id,
+          cityId: pref.city_id,
+          type: 'preference',
+          preferenceOrder: pref.priority
+        })
+        availableCities.delete(pref.city_id)
+        assigned = true
+        break
+      }
+    }
+    
+    // Eğer tercihine yerleşemediyse
+    if (!assigned) {
+      if (profile.wants_lottery) {
+        // Genel kuraya katılmak istiyor → havuza ekle (yer varsa yerleşir)
+        restLotteryPool.push(profile)
+      } else {
+        // Ne tercih ne de genel kura → yerleşemedi
+        results.push({
+          userId: profile.id,
+          cityId: null,
+          type: 'unassigned'
+        })
+      }
+    }
   }
   
-  // Mark remaining lottery pool as unassigned
-  for (let i = remainingCities.length; i < lotteryPool.length; i++) {
-    results.push({
-      userId: lotteryPool[i].id,
-      cityId: null,
-      type: 'unassigned'
-    })
+  // PHASE 3: Lottery yerleştirmesi (önce top N, sonra rest)
+  const remainingCities = Array.from(availableCities)
+  let cityIndex = 0
+  
+  // Önce top N'in lottery pool'unu yerleştir (garanti)
+  for (const profile of topNLotteryPool) {
+    if (cityIndex < remainingCities.length) {
+      results.push({
+        userId: profile.id,
+        cityId: remainingCities[cityIndex],
+        type: 'lottery'
+      })
+      cityIndex++
+    } else {
+      // Bu asla olmamalı (top N her zaman yerleşmeli), ama güvenlik için
+      results.push({
+        userId: profile.id,
+        cityId: null,
+        type: 'unassigned'
+      })
+    }
+  }
+  
+  // Sonra rest'in lottery pool'unu yerleştir (yer varsa)
+  for (const profile of restLotteryPool) {
+    if (cityIndex < remainingCities.length) {
+      results.push({
+        userId: profile.id,
+        cityId: remainingCities[cityIndex],
+        type: 'lottery'
+      })
+      cityIndex++
+    } else {
+      // Yer kalmadı
+      results.push({
+        userId: profile.id,
+        cityId: null,
+        type: 'unassigned'
+      })
+    }
   }
   
   return results
