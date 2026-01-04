@@ -125,6 +125,7 @@ export default function Dashboard() {
                 <th className="px-6 py-3 text-right text-xs font-medium text-[var(--color-text-tertiary)] uppercase">Yazılı</th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-[var(--color-text-tertiary)] uppercase">Mülakat</th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-[var(--color-text-tertiary)] uppercase">Nihai Puan</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-[var(--color-text-tertiary)] uppercase">Hizmet Yılı</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--color-border)]">
@@ -171,6 +172,15 @@ export default function Dashboard() {
                       <span className={`font-semibold ${isTop27 ? 'text-[var(--color-success)]' : 'text-[var(--color-text-secondary)]'}`}>
                         {p.final_score.toFixed(2)}
                       </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                      {p.years_of_service !== null && p.years_of_service !== undefined ? (
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium bg-blue-500/20 text-blue-400">
+                          📅 {p.years_of_service}
+                        </span>
+                      ) : (
+                        <span className="text-[var(--color-text-tertiary)] text-xs">—</span>
+                      )}
                     </td>
                   </tr>
                 )

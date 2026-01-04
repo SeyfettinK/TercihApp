@@ -285,8 +285,8 @@ export default function Admin() {
                     <td className="px-4 py-3 text-right font-bold text-teal-400">{p.final_score.toFixed(2)}</td>
                     <td className="px-4 py-3 text-center">
                       {p.years_of_service !== null && p.years_of_service !== undefined ? (
-                        <span className="px-2 py-1 rounded text-xs bg-blue-500/20 text-blue-400 font-medium">
-                          {p.years_of_service} yıl
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium bg-blue-500/20 text-blue-400">
+                          📅 {p.years_of_service}
                         </span>
                       ) : (
                         <span className="text-gray-500 text-xs">—</span>
