@@ -97,7 +97,32 @@ export function runPlacementAlgorithm(
     }
   }
   
-  // PHASE 2: 28+ kişiler için tercih bazlı yerleştirme (sadece kalan şehirlere)
+  // PHASE 2: İlk N'in lottery havuzunu ÖNCE yerleştir (garanti)
+  // ⚠️ KRİTİK: 28+ kişilere geçmeden önce ilk 27'nin lottery havuzunu yerleştirmeliyiz!
+  let remainingCities = Array.from(availableCities)
+  let cityIndex = 0
+  
+  for (const profile of topNLotteryPool) {
+    if (cityIndex < remainingCities.length) {
+      results.push({
+        userId: profile.id,
+        cityId: remainingCities[cityIndex],
+        type: 'lottery'
+      })
+      availableCities.delete(remainingCities[cityIndex]) // Şehri kullanılabilir listeden çıkar
+      cityIndex++
+    } else {
+      // Bu asla olmamalı (top N her zaman yerleşmeli), ama güvenlik için
+      console.error('HATA: İlk 27 kişiden biri yerleşemedi!', profile)
+      results.push({
+        userId: profile.id,
+        cityId: null,
+        type: 'unassigned'
+      })
+    }
+  }
+  
+  // PHASE 3: 28+ kişiler için tercih bazlı yerleştirme (KALAN şehirlere)
   const restLotteryPool: Profile[] = []
   
   for (const profile of rest) {
@@ -135,30 +160,10 @@ export function runPlacementAlgorithm(
     }
   }
   
-  // PHASE 3: Lottery yerleştirmesi (önce top N, sonra rest)
-  const remainingCities = Array.from(availableCities)
-  let cityIndex = 0
+  // PHASE 4: rest'in lottery pool'unu yerleştir (yer varsa)
+  remainingCities = Array.from(availableCities)
+  cityIndex = 0
   
-  // Önce top N'in lottery pool'unu yerleştir (garanti)
-  for (const profile of topNLotteryPool) {
-    if (cityIndex < remainingCities.length) {
-      results.push({
-        userId: profile.id,
-        cityId: remainingCities[cityIndex],
-        type: 'lottery'
-      })
-      cityIndex++
-    } else {
-      // Bu asla olmamalı (top N her zaman yerleşmeli), ama güvenlik için
-      results.push({
-        userId: profile.id,
-        cityId: null,
-        type: 'unassigned'
-      })
-    }
-  }
-  
-  // Sonra rest'in lottery pool'unu yerleştir (yer varsa)
   for (const profile of restLotteryPool) {
     if (cityIndex < remainingCities.length) {
       results.push({
@@ -168,7 +173,7 @@ export function runPlacementAlgorithm(
       })
       cityIndex++
     } else {
-      // Yer kalmadı
+      // Yer kalmadı (28+ için normal)
       results.push({
         userId: profile.id,
         cityId: null,
