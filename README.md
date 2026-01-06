@@ -70,10 +70,8 @@ Bu uygulama **gizli erişim kodu** ile korunmaktadır. Sadece davet edilen kişi
 
 ### Varsayılan Erişim Kodu
 ```
-justforfun1991
+-*******
 ```
-*(Linus Torvalds'ın "Just for Fun" kitabı + Linux'un doğuş yılı)*
-
 ### Erişim Kodunu Değiştirme
 
 1. Admin olarak giriş yapın
