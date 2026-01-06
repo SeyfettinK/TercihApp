@@ -82,7 +82,7 @@ Bu uygulama **gizli erişim kodu** ile korunmaktadır. Sadece davet edilen kişi
 
 ## İlk Admin Kullanıcısı Oluşturma
 
-1. Uygulamada normal kayıt olun (erişim kodu: `justforfun1991`)
+1. Uygulamada normal kayıt olun (erişim kodu: `******`)
 2. Supabase Dashboard > Table Editor > profiles tablosuna gidin
 3. Kendi kaydınızı bulun ve `is_admin` sütununu `true` yapın
 4. Admin panelinden erişim kodunu değiştirin
