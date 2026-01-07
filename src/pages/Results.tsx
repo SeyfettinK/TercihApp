@@ -9,6 +9,12 @@ interface AssignmentWithDetails extends Assignment {
   preferences?: Preference[]
 }
 
+interface ProfileWithDetails {
+  profile: Profile
+  preferences: Preference[]
+  assignment?: AssignmentWithDetails
+}
+
 export default function Results() {
   const { profile, settings, setSettings } = useStore()
   const [assignments, setAssignments] = useState<AssignmentWithDetails[]>([])
@@ -16,6 +22,7 @@ export default function Results() {
   const [cities, setCities] = useState<City[]>([])
   const [loading, setLoading] = useState(true)
   const [myAssignment, setMyAssignment] = useState<AssignmentWithDetails | null>(null)
+  const [unassignedProfiles, setUnassignedProfiles] = useState<ProfileWithDetails[]>([])
 
   useEffect(() => {
     fetchData()
@@ -74,6 +81,32 @@ export default function Results() {
       // Find my assignment
       const mine = enrichedAssignments.find(a => a.user_id === profile?.id)
       setMyAssignment(mine || null)
+
+      // Find unassigned profiles
+      const assignedUserIds = new Set(assignmentsRes.data.map((a: Assignment) => a.user_id))
+      const unassigned = profilesRes.data
+        .filter((p: Profile) => !assignedUserIds.has(p.id))
+        .map((p: Profile) => ({
+          profile: p,
+          preferences: preferencesRes.data.filter((pref: Preference) => pref.user_id === p.id),
+          assignment: undefined
+        }))
+
+      // Sort unassigned by final score and years_of_service (tie-breaker)
+      unassigned.sort((a, b) => {
+        const scoreA = a.profile.final_score || 0
+        const scoreB = b.profile.final_score || 0
+        
+        if (scoreB !== scoreA) {
+          return scoreB - scoreA
+        }
+        
+        const yearsA = a.profile.years_of_service ?? 0
+        const yearsB = b.profile.years_of_service ?? 0
+        return yearsB - yearsA
+      })
+
+      setUnassignedProfiles(unassigned)
     }
 
     setLoading(false)
@@ -207,7 +240,7 @@ export default function Results() {
         {/* Results Table */}
         <div className="card overflow-hidden mb-8">
           <div className="px-6 py-4 border-b border-[var(--color-border)]">
-            <h2 className="text-lg font-semibold text-white">Tüm Yerleştirmeler</h2>
+            <h2 className="text-lg font-semibold text-white">✅ Yerleşenler ({assignments.length} kişi)</h2>
             <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
               Yeşil çerçeve = Yerleştiği il
             </p>
@@ -324,6 +357,107 @@ export default function Results() {
             </div>
           )}
         </div>
+
+        {/* Unassigned (Waiting List) Table */}
+        {unassignedProfiles.length > 0 && (
+          <div className="card overflow-hidden mb-8">
+            <div className="px-6 py-4 border-b border-[var(--color-border)]">
+              <h2 className="text-lg font-semibold text-white">⏳ Yerleşemeyenler / Yedekler ({unassignedProfiles.length} kişi)</h2>
+              <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
+                Bu kişiler tercih yaptı ancak yerleşemediler
+              </p>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-[var(--color-bg-tertiary)]">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">Sıra</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">Ad Soyad</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-[var(--color-text-tertiary)] uppercase">Nihai Puan</th>
+                    <th className="px-4 py-3 text-center text-xs font-medium text-[var(--color-text-tertiary)] uppercase">Hizmet Yılı</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">Tercihleri</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">Durum</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[var(--color-border)]">
+                {unassignedProfiles.map((item) => {
+                  const isMe = item.profile.id === profile?.id
+                  const sortedPrefs = item.preferences.sort((a, b) => a.priority - b.priority)
+                  const rank = profiles.findIndex(p => p.id === item.profile.id) + 1
+                  
+                  return (
+                    <tr 
+                      key={item.profile.id} 
+                      className={`transition-colors ${
+                        isMe 
+                          ? 'bg-[var(--color-accent)]/10 border-l-2 border-l-[var(--color-accent)]' 
+                          : 'hover:bg-[var(--color-bg-tertiary)]'
+                      }`}
+                    >
+                      <td className="px-4 py-3">
+                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold text-[var(--color-text-secondary)]">
+                          {rank}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <span className={`font-medium ${isMe ? 'text-[var(--color-accent)]' : 'text-white'}`}>
+                            {item.profile.full_name || '-'}
+                          </span>
+                          {isMe && (
+                            <span className="px-2 py-0.5 bg-[var(--color-accent)]/20 text-[var(--color-accent)] text-xs rounded">
+                              Siz
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-right text-[var(--color-text-secondary)]">
+                        {item.profile.final_score.toFixed(2) || '-'}
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        {item.profile.years_of_service !== null && item.profile.years_of_service !== undefined ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium bg-blue-500/20 text-blue-400">
+                            📅 {item.profile.years_of_service}
+                          </span>
+                        ) : (
+                          <span className="text-[var(--color-text-tertiary)] text-xs">—</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex flex-wrap gap-1">
+                          {sortedPrefs.map((pref) => {
+                            const prefCity = cities.find(c => c.id === pref.city_id)
+                            
+                            return (
+                              <div
+                                key={pref.id}
+                                className="px-2 py-1 rounded text-xs bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] border border-[var(--color-border)]"
+                                title={`${pref.priority}. tercih`}
+                              >
+                                {pref.priority}. {prefCity?.name || '-'}
+                              </div>
+                            )
+                          })}
+                          {sortedPrefs.length === 0 && (
+                            <span className="text-[var(--color-text-tertiary)] text-xs italic">
+                              Tercih yapılmamış
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="px-2 py-1 rounded text-xs bg-red-500/20 text-red-400">
+                          Yerleşemedi
+                        </span>
+                      </td>
+                    </tr>
+                  )
+                })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
 
         {/* City Assignments Grid */}
         <div className="card overflow-hidden">
