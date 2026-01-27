@@ -9,6 +9,7 @@ export interface Profile {
   is_admin: boolean
   created_at: string
   years_of_service?: number // İsteğe bağlı: Aynı puana sahip kullanıcılar için tie-breaker
+  preferences_confirmed: boolean // Tercihler kesin mi? true = net, false = değişebilir
 }
 
 export interface City {

@@ -38,7 +38,7 @@ export default function Results() {
     ])
 
     if (settingsRes.data) setSettings(settingsRes.data as Settings)
-    
+
     // Sort profiles with tie-breaker (years_of_service)
     if (profilesRes.data) {
       const sortedProfiles = (profilesRes.data as Profile[]).sort((a, b) => {
@@ -51,7 +51,7 @@ export default function Results() {
       })
       setProfiles(sortedProfiles)
     }
-    
+
     if (citiesRes.data) setCities(citiesRes.data as City[])
 
     if (assignmentsRes.data && profilesRes.data && citiesRes.data && preferencesRes.data) {
@@ -66,11 +66,11 @@ export default function Results() {
       enrichedAssignments.sort((a, b) => {
         const scoreA = a.profile?.final_score || 0
         const scoreB = b.profile?.final_score || 0
-        
+
         if (scoreB !== scoreA) {
           return scoreB - scoreA
         }
-        
+
         const yearsA = a.profile?.years_of_service ?? 0
         const yearsB = b.profile?.years_of_service ?? 0
         return yearsB - yearsA
@@ -96,11 +96,11 @@ export default function Results() {
       unassigned.sort((a, b) => {
         const scoreA = a.profile.final_score || 0
         const scoreB = b.profile.final_score || 0
-        
+
         if (scoreB !== scoreA) {
           return scoreB - scoreA
         }
-        
+
         const yearsA = a.profile.years_of_service ?? 0
         const yearsB = b.profile.years_of_service ?? 0
         return yearsB - yearsA
@@ -151,17 +151,15 @@ export default function Results() {
 
         {/* My Result Card */}
         {profile && (
-          <div className={`card mb-8 p-6 ${
-            myAssignment 
-              ? 'border-emerald-500/30' 
-              : 'border-amber-500/30'
-          }`}>
+          <div className={`card mb-8 p-6 ${myAssignment
+            ? 'border-emerald-500/30'
+            : 'border-amber-500/30'
+            }`}>
             <div className="flex flex-col md:flex-row md:items-center gap-6">
-              <div className={`w-16 h-16 rounded-xl flex items-center justify-center text-4xl ${
-                myAssignment 
-                  ? 'bg-emerald-500/20 text-emerald-400' 
-                  : 'bg-amber-500/20 text-amber-400'
-              }`}>
+              <div className={`w-16 h-16 rounded-xl flex items-center justify-center text-4xl ${myAssignment
+                ? 'bg-emerald-500/20 text-emerald-400'
+                : 'bg-amber-500/20 text-amber-400'
+                }`}>
                 {myAssignment ? '✓' : '–'}
               </div>
               <div className="flex-1">
@@ -176,11 +174,10 @@ export default function Results() {
                   <div className="mt-3">
                     <span className="text-[var(--color-text-secondary)]">Yerleştiğiniz İl: </span>
                     <span className="text-2xl font-bold text-emerald-400">{myAssignment.city?.name}</span>
-                    <span className={`ml-3 px-2 py-1 rounded text-xs ${
-                      myAssignment.assignment_type === 'preference' 
-                        ? 'bg-emerald-500/20 text-emerald-400' 
-                        : 'bg-amber-500/20 text-amber-400'
-                    }`}>
+                    <span className={`ml-3 px-2 py-1 rounded text-xs ${myAssignment.assignment_type === 'preference'
+                      ? 'bg-emerald-500/20 text-emerald-400'
+                      : 'bg-amber-500/20 text-amber-400'
+                      }`}>
                       {myAssignment.assignment_type === 'preference' ? 'Tercih ile' : 'Kura ile'}
                     </span>
                   </div>
@@ -259,94 +256,95 @@ export default function Results() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--color-border)]">
-              {assignments.map((assignment, index) => {
-                const isMe = assignment.user_id === profile?.id
-                const sortedPrefs = (assignment.preferences || []).sort((a, b) => a.priority - b.priority)
-                
-                return (
-                  <tr 
-                    key={assignment.id} 
-                    className={`transition-colors ${
-                      isMe 
-                        ? 'bg-[var(--color-accent)]/10 border-l-2 border-l-[var(--color-accent)]' 
+                {assignments.map((assignment, index) => {
+                  const isMe = assignment.user_id === profile?.id
+                  const sortedPrefs = (assignment.preferences || []).sort((a, b) => a.priority - b.priority)
+
+                  return (
+                    <tr
+                      key={assignment.id}
+                      className={`transition-colors ${isMe
+                        ? 'bg-[var(--color-accent)]/10 border-l-2 border-l-[var(--color-accent)]'
                         : 'hover:bg-[var(--color-bg-tertiary)]'
-                    }`}
-                  >
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold ${
-                        index < 3 
-                          ? 'text-[var(--color-accent)]' 
+                        }`}
+                    >
+                      <td className="px-4 py-3">
+                        <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold ${index < 3
+                          ? 'text-[var(--color-accent)]'
                           : 'text-[var(--color-text-secondary)]'
-                      }`}>
-                        {index + 1}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <span className={`font-medium ${isMe ? 'text-[var(--color-accent)]' : 'text-white'}`}>
-                          {assignment.profile?.full_name || '-'}
+                          }`}>
+                          {index + 1}
                         </span>
-                        {isMe && (
-                          <span className="px-2 py-0.5 bg-[var(--color-accent)]/20 text-[var(--color-accent)] text-xs rounded">
-                            Siz
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <span className={`font-medium ${isMe ? 'text-[var(--color-accent)]' : 'text-white'}`}>
+                            {assignment.profile?.full_name || '-'}
                           </span>
+                          {isMe && (
+                            <span className="px-2 py-0.5 bg-[var(--color-accent)]/20 text-[var(--color-accent)] text-xs rounded">
+                              Siz
+                            </span>
+                          )}
+                          {assignment.profile?.preferences_confirmed === false && (
+                            <span className="px-2 py-0.5 bg-orange-500/20 text-orange-400 text-xs rounded" title="Bu kullanıcının tercihleri henüz kesinleşmemiş">
+                              ❓ Net Değil
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-right text-[var(--color-text-secondary)]">
+                        {assignment.profile?.final_score.toFixed(2) || '-'}
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        {assignment.profile?.years_of_service !== null && assignment.profile?.years_of_service !== undefined ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium bg-blue-500/20 text-blue-400">
+                            📅 {assignment.profile.years_of_service}
+                          </span>
+                        ) : (
+                          <span className="text-[var(--color-text-tertiary)] text-xs">—</span>
                         )}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-right text-[var(--color-text-secondary)]">
-                      {assignment.profile?.final_score.toFixed(2) || '-'}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      {assignment.profile?.years_of_service !== null && assignment.profile?.years_of_service !== undefined ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium bg-blue-500/20 text-blue-400">
-                          📅 {assignment.profile.years_of_service}
-                        </span>
-                      ) : (
-                        <span className="text-[var(--color-text-tertiary)] text-xs">—</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex flex-wrap gap-1">
-                        {sortedPrefs.map((pref) => {
-                          const prefCity = cities.find(c => c.id === pref.city_id)
-                          const isAssigned = pref.city_id === assignment.city_id
-                          
-                          return (
-                            <div
-                              key={pref.id}
-                              className={`px-2 py-1 rounded text-xs ${
-                                isAssigned
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex flex-wrap gap-1">
+                          {sortedPrefs.map((pref) => {
+                            const prefCity = cities.find(c => c.id === pref.city_id)
+                            const isAssigned = pref.city_id === assignment.city_id
+
+                            return (
+                              <div
+                                key={pref.id}
+                                className={`px-2 py-1 rounded text-xs ${isAssigned
                                   ? 'bg-emerald-500/20 text-emerald-400 border-2 border-emerald-500 font-semibold'
                                   : 'bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] border border-[var(--color-border)]'
-                              }`}
-                              title={`${pref.priority}. tercih`}
-                            >
-                              {pref.priority}. {prefCity?.name || '-'}
-                            </div>
-                          )
-                        })}
-                        {sortedPrefs.length === 0 && (
-                          <span className="text-[var(--color-text-tertiary)] text-xs italic">
-                            Tercih yapılmamış
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-emerald-400 font-medium">
-                      {assignment.city?.name || '-'}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className={`px-2 py-1 rounded text-xs ${
-                        assignment.assignment_type === 'preference' 
-                          ? 'bg-emerald-500/20 text-emerald-400' 
+                                  }`}
+                                title={`${pref.priority}. tercih`}
+                              >
+                                {pref.priority}. {prefCity?.name || '-'}
+                              </div>
+                            )
+                          })}
+                          {sortedPrefs.length === 0 && (
+                            <span className="text-[var(--color-text-tertiary)] text-xs italic">
+                              Tercih yapılmamış
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-emerald-400 font-medium">
+                        {assignment.city?.name || '-'}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`px-2 py-1 rounded text-xs ${assignment.assignment_type === 'preference'
+                          ? 'bg-emerald-500/20 text-emerald-400'
                           : 'bg-amber-500/20 text-amber-400'
-                      }`}>
-                        {assignment.assignment_type === 'preference' ? 'Tercih' : 'Kura'}
-                      </span>
-                    </td>
-                  </tr>
-                )
-              })}
+                          }`}>
+                          {assignment.assignment_type === 'preference' ? 'Tercih' : 'Kura'}
+                        </span>
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>
@@ -380,79 +378,83 @@ export default function Results() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[var(--color-border)]">
-                {unassignedProfiles.map((item) => {
-                  const isMe = item.profile.id === profile?.id
-                  const sortedPrefs = item.preferences.sort((a, b) => a.priority - b.priority)
-                  const rank = profiles.findIndex(p => p.id === item.profile.id) + 1
-                  
-                  return (
-                    <tr 
-                      key={item.profile.id} 
-                      className={`transition-colors ${
-                        isMe 
-                          ? 'bg-[var(--color-accent)]/10 border-l-2 border-l-[var(--color-accent)]' 
+                  {unassignedProfiles.map((item) => {
+                    const isMe = item.profile.id === profile?.id
+                    const sortedPrefs = item.preferences.sort((a, b) => a.priority - b.priority)
+                    const rank = profiles.findIndex(p => p.id === item.profile.id) + 1
+
+                    return (
+                      <tr
+                        key={item.profile.id}
+                        className={`transition-colors ${isMe
+                          ? 'bg-[var(--color-accent)]/10 border-l-2 border-l-[var(--color-accent)]'
                           : 'hover:bg-[var(--color-bg-tertiary)]'
-                      }`}
-                    >
-                      <td className="px-4 py-3">
-                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold text-[var(--color-text-secondary)]">
-                          {rank}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-2">
-                          <span className={`font-medium ${isMe ? 'text-[var(--color-accent)]' : 'text-white'}`}>
-                            {item.profile.full_name || '-'}
+                          }`}
+                      >
+                        <td className="px-4 py-3">
+                          <span className="inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold text-[var(--color-text-secondary)]">
+                            {rank}
                           </span>
-                          {isMe && (
-                            <span className="px-2 py-0.5 bg-[var(--color-accent)]/20 text-[var(--color-accent)] text-xs rounded">
-                              Siz
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            <span className={`font-medium ${isMe ? 'text-[var(--color-accent)]' : 'text-white'}`}>
+                              {item.profile.full_name || '-'}
                             </span>
+                            {isMe && (
+                              <span className="px-2 py-0.5 bg-[var(--color-accent)]/20 text-[var(--color-accent)] text-xs rounded">
+                                Siz
+                              </span>
+                            )}
+                            {item.profile.preferences_confirmed === false && (
+                              <span className="px-2 py-0.5 bg-orange-500/20 text-orange-400 text-xs rounded" title="Bu kullanıcının tercihleri henüz kesinleşmemiş">
+                                ❓ Net Değil
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-right text-[var(--color-text-secondary)]">
+                          {item.profile.final_score.toFixed(2) || '-'}
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          {item.profile.years_of_service !== null && item.profile.years_of_service !== undefined ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium bg-blue-500/20 text-blue-400">
+                              📅 {item.profile.years_of_service}
+                            </span>
+                          ) : (
+                            <span className="text-[var(--color-text-tertiary)] text-xs">—</span>
                           )}
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 text-right text-[var(--color-text-secondary)]">
-                        {item.profile.final_score.toFixed(2) || '-'}
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        {item.profile.years_of_service !== null && item.profile.years_of_service !== undefined ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium bg-blue-500/20 text-blue-400">
-                            📅 {item.profile.years_of_service}
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex flex-wrap gap-1">
+                            {sortedPrefs.map((pref) => {
+                              const prefCity = cities.find(c => c.id === pref.city_id)
+
+                              return (
+                                <div
+                                  key={pref.id}
+                                  className="px-2 py-1 rounded text-xs bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] border border-[var(--color-border)]"
+                                  title={`${pref.priority}. tercih`}
+                                >
+                                  {pref.priority}. {prefCity?.name || '-'}
+                                </div>
+                              )
+                            })}
+                            {sortedPrefs.length === 0 && (
+                              <span className="text-[var(--color-text-tertiary)] text-xs italic">
+                                Tercih yapılmamış
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="px-2 py-1 rounded text-xs bg-red-500/20 text-red-400">
+                            Yerleşemedi
                           </span>
-                        ) : (
-                          <span className="text-[var(--color-text-tertiary)] text-xs">—</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex flex-wrap gap-1">
-                          {sortedPrefs.map((pref) => {
-                            const prefCity = cities.find(c => c.id === pref.city_id)
-                            
-                            return (
-                              <div
-                                key={pref.id}
-                                className="px-2 py-1 rounded text-xs bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] border border-[var(--color-border)]"
-                                title={`${pref.priority}. tercih`}
-                              >
-                                {pref.priority}. {prefCity?.name || '-'}
-                              </div>
-                            )
-                          })}
-                          {sortedPrefs.length === 0 && (
-                            <span className="text-[var(--color-text-tertiary)] text-xs italic">
-                              Tercih yapılmamış
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className="px-2 py-1 rounded text-xs bg-red-500/20 text-red-400">
-                          Yerleşemedi
-                        </span>
-                      </td>
-                    </tr>
-                  )
-                })}
+                        </td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>
@@ -469,23 +471,27 @@ export default function Results() {
               const assignment = assignments.find(a => a.city_id === city.id)
               const isMyCity = assignment?.user_id === profile?.id
               return (
-                <div 
-                  key={city.id} 
-                  className={`p-4 rounded-lg border ${
-                    isMyCity 
-                      ? 'bg-[var(--color-accent)]/10 border-[var(--color-accent)]' 
-                      : assignment 
-                        ? 'bg-[var(--color-bg-tertiary)] border-[var(--color-border)]' 
-                        : 'bg-[var(--color-bg-secondary)] border-dashed border-[var(--color-border)]'
-                  }`}
+                <div
+                  key={city.id}
+                  className={`p-4 rounded-lg border ${isMyCity
+                    ? 'bg-[var(--color-accent)]/10 border-[var(--color-accent)]'
+                    : assignment
+                      ? 'bg-[var(--color-bg-tertiary)] border-[var(--color-border)]'
+                      : 'bg-[var(--color-bg-secondary)] border-dashed border-[var(--color-border)]'
+                    }`}
                 >
                   <p className={`font-medium text-sm ${isMyCity ? 'text-[var(--color-accent)]' : 'text-white'}`}>
                     {city.name}
                   </p>
                   {assignment ? (
-                    <p className="text-xs text-[var(--color-text-secondary)] mt-1">
-                      {assignment.profile?.full_name}
-                    </p>
+                    <div className="flex items-center gap-1 mt-1">
+                      <p className="text-xs text-[var(--color-text-secondary)]">
+                        {assignment.profile?.full_name}
+                      </p>
+                      {assignment.profile?.preferences_confirmed === false && (
+                        <span className="text-orange-400 text-xs" title="Tercihler net değil">❓</span>
+                      )}
+                    </div>
                   ) : (
                     <p className="text-xs text-[var(--color-text-tertiary)] mt-1">Boş</p>
                   )}

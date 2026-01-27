@@ -8,7 +8,7 @@ export default function Profile() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
-  
+
   // Şifre değiştirme
   const [passwords, setPasswords] = useState({
     current: '',
@@ -25,6 +25,10 @@ export default function Profile() {
   const [yearsOfService, setYearsOfService] = useState<number | null>(profile?.years_of_service ?? null)
   const [editingYears, setEditingYears] = useState(false)
   const [yearsLoading, setYearsLoading] = useState(false)
+
+  // Tercih netliği
+  const [preferencesConfirmed, setPreferencesConfirmed] = useState(profile?.preferences_confirmed ?? true)
+  const [preferencesLoading, setPreferencesLoading] = useState(false)
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -105,6 +109,28 @@ export default function Profile() {
     setYearsLoading(false)
   }
 
+  const handlePreferencesConfirmedChange = async () => {
+    setPreferencesLoading(true)
+    setMessage(null)
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ preferences_confirmed: !preferencesConfirmed })
+        .eq('id', profile?.id)
+
+      if (error) throw error
+
+      setPreferencesConfirmed(!preferencesConfirmed)
+      setProfile({ ...profile!, preferences_confirmed: !preferencesConfirmed })
+      setMessage({ type: 'success', text: '✅ Tercih netliği durumunuz güncellendi!' })
+    } catch (error: any) {
+      setMessage({ type: 'error', text: `Güncelleme başarısız: ${error.message}` })
+    }
+
+    setPreferencesLoading(false)
+  }
+
   const handleLogout = async () => {
     await supabase.auth.signOut()
     navigate('/login')
@@ -122,11 +148,10 @@ export default function Profile() {
         </div>
 
         {message && (
-          <div className={`mb-6 px-4 py-3 rounded-lg ${
-            message.type === 'success' 
-              ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400' 
-              : 'bg-red-500/10 border border-red-500/30 text-red-400'
-          }`}>
+          <div className={`mb-6 px-4 py-3 rounded-lg ${message.type === 'success'
+            ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400'
+            : 'bg-red-500/10 border border-red-500/30 text-red-400'
+            }`}>
             {message.text}
           </div>
         )}
@@ -141,10 +166,10 @@ export default function Profile() {
                     {profile.full_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
                   </span>
                 </div>
-                
+
                 <h2 className="text-xl font-bold text-white mb-1">{profile.full_name}</h2>
                 <p className="text-sm text-[var(--color-text-secondary)] mb-4">{profile.email}</p>
-                
+
                 {profile.is_admin && (
                   <div className="inline-block px-3 py-1 bg-purple-500/20 text-purple-400 rounded-full text-sm font-medium mb-4">
                     👑 Admin
@@ -184,7 +209,7 @@ export default function Profile() {
                   </button>
                 )}
               </div>
-              
+
               {editingYears ? (
                 <div className="p-6 space-y-4">
                   <div className="flex items-start gap-4">
@@ -197,7 +222,7 @@ export default function Profile() {
                         Aynı puana sahip olduğunuz başka kullanıcılar varsa, hizmet yılı daha yüksek olan öncelikli olarak yerleştirilir.
                         Bu alan <strong>isteğe bağlıdır</strong>, boş bırakabilirsiniz.
                       </p>
-                      
+
                       <div className="mb-4">
                         <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
                           Hizmet Yılı (İsteğe Bağlı)
@@ -254,13 +279,58 @@ export default function Profile() {
                   <div className="flex-1">
                     <p className="text-white font-medium">Hizmet Süreniz</p>
                     <p className="text-sm text-[var(--color-text-secondary)]">
-                      {yearsOfService !== null && yearsOfService !== undefined 
+                      {yearsOfService !== null && yearsOfService !== undefined
                         ? `${yearsOfService} yıl - Aynı puana sahip adaylar arasında hizmet yılı yüksek olan öncelikli yerleşir`
                         : 'Henüz girilmedi - Aynı puanda olup hizmet yılı girmeyenler 0 yıl kabul edilir'}
                     </p>
                   </div>
                 </div>
               )}
+            </div>
+
+            {/* Tercih Netliği */}
+            <div className="card overflow-hidden">
+              <div className="px-6 py-4 border-b border-[var(--color-border)]">
+                <h3 className="text-lg font-semibold text-white">Tercih Netliği</h3>
+              </div>
+              <div className="p-6">
+                <div className="flex items-start gap-4">
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 ${preferencesConfirmed ? 'bg-emerald-500/20' : 'bg-orange-500/20'}`}>
+                    {preferencesConfirmed ? '✓' : '❓'}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-white font-medium mb-2">Tercihleriniz Kesin mi?</p>
+                    <p className="text-sm text-[var(--color-text-secondary)] mb-4">
+                      Tercihlerinizin kesin olup olmadığını belirtin. Eğer henüz kararsızsanız "Net Değil" olarak işaretleyebilirsiniz.
+                      Bu bilgi sonuçlar sayfasında gösterilecektir.
+                    </p>
+                    <button
+                      onClick={handlePreferencesConfirmedChange}
+                      disabled={preferencesLoading}
+                      className={`px-6 py-3 rounded-lg font-medium transition-all ${preferencesConfirmed
+                        ? 'bg-emerald-500 text-white hover:bg-emerald-600'
+                        : 'bg-orange-500 text-white hover:bg-orange-600'
+                        }`}
+                    >
+                      {preferencesLoading ? (
+                        <span className="flex items-center gap-2">
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                          Güncelleniyor...
+                        </span>
+                      ) : preferencesConfirmed ? (
+                        '✓ Tercihlerim Net'
+                      ) : (
+                        '❓ Tercihlerim Net Değil'
+                      )}
+                    </button>
+                    {!preferencesConfirmed && (
+                      <p className="text-xs text-orange-400 mt-3">
+                        ⚠️ Tercihleriniz "Net Değil" olarak işaretlendi. Sonuçlar sayfasında isminizin yanında bu bilgi gösterilecektir.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Kura Tercihi */}
@@ -281,11 +351,10 @@ export default function Profile() {
                     <button
                       onClick={handleLotteryChange}
                       disabled={lotteryLoading}
-                      className={`px-6 py-3 rounded-lg font-medium transition-all ${
-                        wantsLottery
-                          ? 'bg-emerald-500 text-white hover:bg-emerald-600'
-                          : 'bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] border border-[var(--color-border)]'
-                      }`}
+                      className={`px-6 py-3 rounded-lg font-medium transition-all ${wantsLottery
+                        ? 'bg-emerald-500 text-white hover:bg-emerald-600'
+                        : 'bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] border border-[var(--color-border)]'
+                        }`}
                     >
                       {lotteryLoading ? (
                         <span className="flex items-center gap-2">
@@ -316,7 +385,7 @@ export default function Profile() {
                   </button>
                 )}
               </div>
-              
+
               {showPasswords ? (
                 <form onSubmit={handlePasswordChange} className="p-6 space-y-4">
                   <div>
@@ -405,10 +474,10 @@ export default function Profile() {
                   🚪 Çıkış Yap
                 </button>
                 <p className="text-xs text-[var(--color-text-tertiary)] mt-3 text-center">
-                  Hesap kaydı: {new Date(profile.created_at).toLocaleDateString('tr-TR', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
+                  Hesap kaydı: {new Date(profile.created_at).toLocaleDateString('tr-TR', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
                   })}
                 </p>
               </div>
