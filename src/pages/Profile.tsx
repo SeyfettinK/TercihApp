@@ -26,8 +26,8 @@ export default function Profile() {
   const [editingYears, setEditingYears] = useState(false)
   const [yearsLoading, setYearsLoading] = useState(false)
 
-  // Tercih netliği
-  const [preferencesConfirmed, setPreferencesConfirmed] = useState(profile?.preferences_confirmed ?? true)
+  // Resmi tercih işlemi
+  const [preferencesConfirmed, setPreferencesConfirmed] = useState(profile?.preferences_confirmed ?? false)
   const [preferencesLoading, setPreferencesLoading] = useState(false)
 
   const handlePasswordChange = async (e: React.FormEvent) => {
@@ -288,20 +288,20 @@ export default function Profile() {
               )}
             </div>
 
-            {/* Tercih Netliği */}
+            {/* Resmi Tercih İşlemi */}
             <div className="card overflow-hidden">
               <div className="px-6 py-4 border-b border-[var(--color-border)]">
-                <h3 className="text-lg font-semibold text-white">Tercih Netliği</h3>
+                <h3 className="text-lg font-semibold text-white">Resmi Tercih İşlemi</h3>
               </div>
               <div className="p-6">
                 <div className="flex items-start gap-4">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 ${preferencesConfirmed ? 'bg-emerald-500/20' : 'bg-orange-500/20'}`}>
-                    {preferencesConfirmed ? '✓' : '❓'}
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 ${preferencesConfirmed ? 'bg-emerald-500/20' : 'bg-red-500/20'}`}>
+                    {preferencesConfirmed ? '✓' : '✗'}
                   </div>
                   <div className="flex-1">
-                    <p className="text-white font-medium mb-2">Tercihleriniz Kesin mi?</p>
+                    <p className="text-white font-medium mb-2">Resmi Tercih İşleminizi Yaptınız mı?</p>
                     <p className="text-sm text-[var(--color-text-secondary)] mb-4">
-                      Tercihlerinizin kesin olup olmadığını belirtin. Eğer henüz kararsızsanız "Net Değil" olarak işaretleyebilirsiniz.
+                      Resmi tercih işleminizi (e-Devlet veya yetkili kurum üzerinden) tamamladıysanız burayı işaretleyin.
                       Bu bilgi sonuçlar sayfasında gösterilecektir.
                     </p>
                     <button
@@ -309,7 +309,7 @@ export default function Profile() {
                       disabled={preferencesLoading}
                       className={`px-6 py-3 rounded-lg font-medium transition-all ${preferencesConfirmed
                         ? 'bg-emerald-500 text-white hover:bg-emerald-600'
-                        : 'bg-orange-500 text-white hover:bg-orange-600'
+                        : 'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30'
                         }`}
                     >
                       {preferencesLoading ? (
@@ -318,14 +318,14 @@ export default function Profile() {
                           Güncelleniyor...
                         </span>
                       ) : preferencesConfirmed ? (
-                        '✓ Tercihlerim Net'
+                        '✓ Resmi Tercih İşlemimi Yaptım'
                       ) : (
-                        '❓ Tercihlerim Net Değil'
+                        '✗ Henüz Yapmadım'
                       )}
                     </button>
                     {!preferencesConfirmed && (
-                      <p className="text-xs text-orange-400 mt-3">
-                        ⚠️ Tercihleriniz "Net Değil" olarak işaretlendi. Sonuçlar sayfasında isminizin yanında bu bilgi gösterilecektir.
+                      <p className="text-xs text-red-400 mt-3">
+                        ⚠️ Resmi tercih işleminizi henüz yapmadığınız görünüyor. İşlemi tamamladığınızda yukarıdaki butona tıklayarak durumunuzu güncelleyin.
                       </p>
                     )}
                   </div>

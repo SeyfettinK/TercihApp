@@ -248,6 +248,7 @@ export default function Results() {
                 <tr className="bg-[var(--color-bg-tertiary)]">
                   <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">Sıra</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">Ad Soyad</th>
+                  <th className="px-4 py-3 text-center text-xs font-medium text-[var(--color-text-tertiary)] uppercase">Resmi İşlem</th>
                   <th className="px-4 py-3 text-right text-xs font-medium text-[var(--color-text-tertiary)] uppercase">Nihai Puan</th>
                   <th className="px-4 py-3 text-center text-xs font-medium text-[var(--color-text-tertiary)] uppercase">Hizmet Yılı</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">Tercihleri</th>
@@ -286,12 +287,18 @@ export default function Results() {
                               Siz
                             </span>
                           )}
-                          {assignment.profile?.preferences_confirmed === false && (
-                            <span className="px-2 py-0.5 bg-orange-500/20 text-orange-400 text-xs rounded" title="Bu kullanıcının tercihleri henüz kesinleşmemiş">
-                              ❓ Net Değil
-                            </span>
-                          )}
                         </div>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        {assignment.profile?.preferences_confirmed ? (
+                          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 text-sm" title="Resmi tercih işlemini yaptı">
+                            ✓
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-500/20 text-red-400 text-sm" title="Resmi tercih işlemini henüz yapmadı">
+                            ✗
+                          </span>
+                        )}
                       </td>
                       <td className="px-4 py-3 text-right text-[var(--color-text-secondary)]">
                         {assignment.profile?.final_score.toFixed(2) || '-'}
@@ -371,6 +378,7 @@ export default function Results() {
                   <tr className="bg-[var(--color-bg-tertiary)]">
                     <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">Sıra</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">Ad Soyad</th>
+                    <th className="px-4 py-3 text-center text-xs font-medium text-[var(--color-text-tertiary)] uppercase">Resmi İşlem</th>
                     <th className="px-4 py-3 text-right text-xs font-medium text-[var(--color-text-tertiary)] uppercase">Nihai Puan</th>
                     <th className="px-4 py-3 text-center text-xs font-medium text-[var(--color-text-tertiary)] uppercase">Hizmet Yılı</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">Tercihleri</th>
@@ -406,12 +414,18 @@ export default function Results() {
                                 Siz
                               </span>
                             )}
-                            {item.profile.preferences_confirmed === false && (
-                              <span className="px-2 py-0.5 bg-orange-500/20 text-orange-400 text-xs rounded" title="Bu kullanıcının tercihleri henüz kesinleşmemiş">
-                                ❓ Net Değil
-                              </span>
-                            )}
                           </div>
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          {item.profile.preferences_confirmed ? (
+                            <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 text-sm" title="Resmi tercih işlemini yaptı">
+                              ✓
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-500/20 text-red-400 text-sm" title="Resmi tercih işlemini henüz yapmadı">
+                              ✗
+                            </span>
+                          )}
                         </td>
                         <td className="px-4 py-3 text-right text-[var(--color-text-secondary)]">
                           {item.profile.final_score.toFixed(2) || '-'}
@@ -484,14 +498,9 @@ export default function Results() {
                     {city.name}
                   </p>
                   {assignment ? (
-                    <div className="flex items-center gap-1 mt-1">
-                      <p className="text-xs text-[var(--color-text-secondary)]">
-                        {assignment.profile?.full_name}
-                      </p>
-                      {assignment.profile?.preferences_confirmed === false && (
-                        <span className="text-orange-400 text-xs" title="Tercihler net değil">❓</span>
-                      )}
-                    </div>
+                    <p className="text-xs text-[var(--color-text-secondary)] mt-1">
+                      {assignment.profile?.full_name}
+                    </p>
                   ) : (
                     <p className="text-xs text-[var(--color-text-tertiary)] mt-1">Boş</p>
                   )}
