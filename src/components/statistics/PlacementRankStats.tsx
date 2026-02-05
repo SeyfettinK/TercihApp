@@ -1,4 +1,4 @@
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LabelList } from 'recharts'
 import type { Preference } from '../../types/database'
 
 interface AssignmentWithPreferences {
@@ -10,6 +10,24 @@ interface PlacementRankStatsProps {
     assignments: AssignmentWithPreferences[]
     title: string
     accentColor?: 'emerald' | 'amber' | 'teal'
+}
+
+// Custom tooltip component
+const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+        return (
+            <div style={{
+                backgroundColor: '#1f2937',
+                border: '1px solid #374151',
+                borderRadius: '8px',
+                padding: '8px 12px'
+            }}>
+                <p style={{ color: '#fff', fontWeight: 600, marginBottom: '4px' }}>{label}</p>
+                <p style={{ color: '#fff' }}>Yerleşen: {payload[0].value} kişi</p>
+            </div>
+        )
+    }
+    return null
 }
 
 export default function PlacementRankStats({
@@ -73,9 +91,9 @@ export default function PlacementRankStats({
             <h3 className="text-lg font-semibold text-white mb-4">{title}</h3>
 
             {/* Bar Chart */}
-            <div style={{ width: '100%', height: 200 }}>
+            <div style={{ width: '100%', height: 220 }}>
                 <ResponsiveContainer>
-                    <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 5 }}>
+                    <BarChart data={chartData} margin={{ top: 20, right: 10, left: -20, bottom: 5 }}>
                         <XAxis
                             dataKey="name"
                             tick={{ fill: '#9ca3af', fontSize: 11 }}
@@ -88,15 +106,7 @@ export default function PlacementRankStats({
                             tickLine={{ stroke: '#374151' }}
                             allowDecimals={false}
                         />
-                        <Tooltip
-                            contentStyle={{
-                                backgroundColor: '#1f2937',
-                                border: '1px solid #374151',
-                                borderRadius: '8px',
-                                color: '#fff'
-                            }}
-                            formatter={(value: any) => [`${value} kişi`, 'Yerleşen']}
-                        />
+                        <Tooltip content={<CustomTooltip />} />
                         <Bar dataKey="count" radius={[4, 4, 0, 0]}>
                             {chartData.map((entry, index) => (
                                 <Cell
@@ -104,14 +114,21 @@ export default function PlacementRankStats({
                                     fill={entry.isLottery ? lotteryColor : mainColor}
                                 />
                             ))}
+                            <LabelList
+                                dataKey="count"
+                                position="top"
+                                fill="#fff"
+                                fontSize={12}
+                                fontWeight={600}
+                            />
                         </Bar>
                     </BarChart>
                 </ResponsiveContainer>
             </div>
 
-            {/* Legend */}
-            <div className="flex flex-wrap gap-4 pt-4 mt-2 border-t border-[var(--color-border)]">
-                {chartData.filter(d => !d.isLottery).slice(0, 5).map((item) => (
+            {/* Legend - show up to 10 items */}
+            <div className="flex flex-wrap gap-3 pt-4 mt-2 border-t border-[var(--color-border)]">
+                {chartData.filter(d => !d.isLottery).slice(0, 10).map((item) => (
                     <div key={item.name} className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded" style={{ backgroundColor: mainColor }} />
                         <span className="text-xs text-[var(--color-text-secondary)]">
