@@ -65,6 +65,7 @@ export default function PlacementRankStats({
     }
 
     const colors = colorClasses[accentColor]
+    const barMaxHeight = 120 // pixels
 
     if (assignments.length === 0) {
         return (
@@ -80,27 +81,30 @@ export default function PlacementRankStats({
             <h3 className="text-lg font-semibold text-white mb-4">{title}</h3>
 
             {/* Bar Chart */}
-            <div className="flex items-end gap-2 h-40 mb-4">
-                {sortedRanks.map(({ rank, count }) => (
-                    <div key={rank} className="flex-1 flex flex-col items-center group">
-                        <span className={`text-xs font-semibold ${colors.text} mb-1 opacity-0 group-hover:opacity-100 transition-opacity`}>
-                            {count}
-                        </span>
-                        <div
-                            className={`w-full rounded-t-lg ${colors.fill} transition-all duration-300 hover:opacity-80`}
-                            style={{ height: `${(count / maxCount) * 100}%`, minHeight: count > 0 ? '8px' : '0' }}
-                        />
-                        <span className="text-xs text-[var(--color-text-secondary)] mt-2">{rank}.</span>
-                    </div>
-                ))}
+            <div className="flex items-end gap-3 mb-4">
+                {sortedRanks.map(({ rank, count }) => {
+                    const barHeight = Math.max((count / maxCount) * barMaxHeight, count > 0 ? 8 : 0)
+                    return (
+                        <div key={rank} className="flex-1 flex flex-col items-center">
+                            <span className={`text-xs font-semibold ${colors.text} mb-1`}>
+                                {count}
+                            </span>
+                            <div
+                                className={`w-full rounded-t-lg ${colors.fill} transition-all duration-300 hover:opacity-80`}
+                                style={{ height: `${barHeight}px` }}
+                            />
+                            <span className="text-xs text-[var(--color-text-secondary)] mt-2">{rank}.</span>
+                        </div>
+                    )
+                })}
                 {lotteryCount > 0 && (
-                    <div className="flex-1 flex flex-col items-center group">
-                        <span className="text-xs font-semibold text-amber-400 mb-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex-1 flex flex-col items-center">
+                        <span className="text-xs font-semibold text-amber-400 mb-1">
                             {lotteryCount}
                         </span>
                         <div
                             className="w-full rounded-t-lg bg-amber-500 transition-all duration-300 hover:opacity-80"
-                            style={{ height: `${(lotteryCount / maxCount) * 100}%`, minHeight: '8px' }}
+                            style={{ height: `${Math.max((lotteryCount / maxCount) * barMaxHeight, 8)}px` }}
                         />
                         <span className="text-xs text-[var(--color-text-secondary)] mt-2">Kura</span>
                     </div>
