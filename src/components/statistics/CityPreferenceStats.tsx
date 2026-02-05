@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { City, Preference } from '../../types/database'
 
 interface CityPreferenceStatsProps {
@@ -13,23 +14,28 @@ export default function CityPreferenceStats({
     title,
     accentColor = 'teal'
 }: CityPreferenceStatsProps) {
+    const [showAll, setShowAll] = useState(false)
+
     // Count preferences per city
     const cityCounts: Record<number, number> = {}
     preferences.forEach(pref => {
         cityCounts[pref.city_id] = (cityCounts[pref.city_id] || 0) + 1
     })
 
-    // Sort by count (descending) and take top 10
-    const sortedCities = Object.entries(cityCounts)
+    // Calculate all sorted cities
+    const allSortedCities = Object.entries(cityCounts)
         .map(([cityId, count]) => ({
             city: cities.find(c => c.id === Number(cityId)),
             count
         }))
         .filter(item => item.city)
         .sort((a, b) => b.count - a.count)
-        .slice(0, 10)
 
-    const maxCount = sortedCities.length > 0 ? sortedCities[0].count : 1
+    // Take displayed cities based on toggle
+    const displayedCities = showAll ? allSortedCities : allSortedCities.slice(0, 10)
+
+    // maxCount should be from allSortedCities to maintain bar scale when toggling
+    const maxCount = allSortedCities.length > 0 ? allSortedCities[0].count : 1
 
     const colorClasses = {
         emerald: {
@@ -51,7 +57,7 @@ export default function CityPreferenceStats({
 
     const colors = colorClasses[accentColor]
 
-    if (sortedCities.length === 0) {
+    if (allSortedCities.length === 0) {
         return (
             <div className="card p-6">
                 <h3 className="text-lg font-semibold text-white mb-4">{title}</h3>
@@ -61,10 +67,10 @@ export default function CityPreferenceStats({
     }
 
     return (
-        <div className="card p-6">
+        <div className="card p-6 h-full flex flex-col">
             <h3 className="text-lg font-semibold text-white mb-4">{title}</h3>
-            <div className="space-y-3">
-                {sortedCities.map(({ city, count }, index) => (
+            <div className="space-y-3 flex-1 overflow-auto max-h-[500px] pr-2 custom-scrollbar">
+                {displayedCities.map(({ city, count }, index) => (
                     <div key={city!.id} className="group">
                         <div className="flex items-center justify-between mb-1">
                             <span className="text-sm text-white flex items-center gap-2">
@@ -84,6 +90,18 @@ export default function CityPreferenceStats({
                     </div>
                 ))}
             </div>
+
+            {allSortedCities.length > 10 && (
+                <button
+                    onClick={() => setShowAll(!showAll)}
+                    className={`mt-6 w-full py-2.5 rounded-lg text-sm font-medium transition-all border ${showAll
+                            ? 'bg-transparent border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-tertiary)]'
+                            : `${colors.bg} ${colors.text} border-transparent hover:brightness-110`
+                        }`}
+                >
+                    {showAll ? 'Daha Az Göster' : `Tüm İlleri Göster (${allSortedCities.length} İl)`}
+                </button>
+            )}
         </div>
     )
 }
