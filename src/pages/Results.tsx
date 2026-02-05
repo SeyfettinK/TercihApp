@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useStore } from '../store/useStore'
 import { supabase } from '../lib/supabase'
+import { ResultsStatistics } from '../components/statistics'
 import type { Profile, City, Assignment, Settings, Preference } from '../types/database'
 
 interface AssignmentWithDetails extends Assignment {
@@ -23,6 +24,7 @@ export default function Results() {
   const [loading, setLoading] = useState(true)
   const [myAssignment, setMyAssignment] = useState<AssignmentWithDetails | null>(null)
   const [unassignedProfiles, setUnassignedProfiles] = useState<ProfileWithDetails[]>([])
+  const [allPreferences, setAllPreferences] = useState<Preference[]>([])
 
   useEffect(() => {
     fetchData()
@@ -55,6 +57,9 @@ export default function Results() {
     if (citiesRes.data) setCities(citiesRes.data as City[])
 
     if (assignmentsRes.data && profilesRes.data && citiesRes.data && preferencesRes.data) {
+      // Store all preferences for statistics
+      setAllPreferences(preferencesRes.data as Preference[])
+
       const enrichedAssignments: AssignmentWithDetails[] = assignmentsRes.data.map((a: Assignment) => ({
         ...a,
         profile: profilesRes.data.find((p: Profile) => p.id === a.user_id),
@@ -233,6 +238,14 @@ export default function Results() {
             </div>
           </div>
         </div>
+
+        {/* Detailed Statistics */}
+        <ResultsStatistics
+          assignments={assignments}
+          unassignedProfiles={unassignedProfiles}
+          cities={cities}
+          allPreferences={allPreferences}
+        />
 
         {/* Results Table */}
         <div className="card overflow-hidden mb-8">
